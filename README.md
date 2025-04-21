@@ -57,6 +57,7 @@ A simple Flask-based web app was developed where users can:
 
 ## 📊 Folder Structure
 
+```
 ├── app.py
 ├── data/
 │   ├── Data_2020_2024.csv
@@ -72,6 +73,7 @@ A simple Flask-based web app was developed where users can:
 │   └── images/
 │       └── flood_map.gif
 └── README.md
+```
 
 ## 📌 References
 
