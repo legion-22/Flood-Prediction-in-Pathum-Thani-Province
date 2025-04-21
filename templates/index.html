@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flood Prediction Web App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to right, #e0f7fa, #80deea);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            margin-top: 40px;
+            margin-bottom: 40px;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+        }
+        .form-control {
+            margin-bottom: 15px;
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            font-weight: bold;
+        }
+        h2 {
+            color: #0d6efd;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .description {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 25px;
+        }
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        .map-image {
+            max-width: 100%;
+            height: auto;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto 20px;
+            border-radius: 10px;
+        }
+
+        fieldset {
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        legend {
+            font-size: 16px;
+            font-weight: bold;
+            color: #0d6efd;
+            width: auto;
+            padding: 0 0px;
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            .map-image {
+                max-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="text-center">Flood Prediction Form</h2>
+    <p class="description text-center">
+        This web application is designed to assist in estimating the risk of flooding at Bang Sai Gate (C.29A),  
+        which is the final and most critical water gate controlling the outflow of the Chao Phraya River before it reaches the Gulf of Thailand.  
+        Water levels at this gate are highly influential in determining flood risks in Pathum Thani Province.
+    
+        <br><br>
+        Note: This prediction model does not focus on localized flash floods caused by heavy rain within the province.  
+        Instead, it primarily considers the upstream water flow from northern regions of Thailand,  
+        which significantly impacts the water volume passing through C.29A and downstream flood risks.
+    </p>
+    
+    <p class="text-center">
+        Whenever available, the latest data from public APIs will automatically populate the form fields.
+        You can also manually adjust the values if you'd like to explore different scenarios.
+    </p>
+    
+
+    <div class="row align-items-start">
+        <!-- Left: Map image -->
+        <div class="col-md-6 mb-4">
+            <img src="{{ url_for('static', filename='images/flood_map.gif') }}" alt="Flood Map" class="map-image">
+        </div>
+
+        <!-- Right: Form -->
+        <div class="col-md-6">
+            <form action="/predict" method="post">
+
+                <!-- Group 1: Water Discharge -->
+                <fieldset>
+                    <legend>Water Discharge (m³/s)</legend>
+                    <small class="text-muted d-block mb-2">
+                        Water flow rates from three stations: Banphot Phisai (P.17), Chun Saeng (N.67), and Chai Nat (C.13) Water Gates.
+                    </small>
+
+                    <label class="form-label">Banphot Phisai</label>
+                    <input class="form-control" type="number" step="0.01"
+                        name="Water Station P.17 [m³/s] " 
+                        value="{{ request.form.get('Water Station P.17 [m³/s] ', discharge_data.get('Water Station P.17 [m³/s] ', '')) }}"
+                        placeholder="Banphot Phisai (P.17)" required>
+
+                    <label class="form-label">Chun Saeng</label>
+                    <input class="form-control" type="number" step="0.01"
+                        name="Water Station N.67 [m³/s] "
+                        value="{{ request.form.get('Water Station N.67 [m³/s] ', discharge_data.get('Water Station N.67 [m³/s] ', '')) }}"
+                        placeholder="Chun Saeng (N.67)" required>
+
+                    <label class="form-label">Chai Nat</label>
+                    <input class="form-control" type="number" step="0.01"
+                        name="Water Station C.13 [m³/s] "
+                        value="{{ request.form.get('Water Station C.13 [m³/s] ', discharge_data.get('Water Station C.13 [m³/s] ', '')) }}"
+                        placeholder="Chai Nat (C.13)" required>
+                </fieldset>
+
+                <!-- Group 2: Rainfall -->
+                <fieldset>
+                    <legend>Rainfall (mm)</legend>
+                    <small class="text-muted d-block mb-2">
+                        Rainfall values in each district: Phak Hai, Bang Ban, Tha Ruea, and Bang Pahan.
+                    </small>
+
+                    <label class="form-label">Phak Hai</label>
+                    <input class="form-control" type="number" step="0.01"
+                        name="Rainfall TCP004 (mm)"
+                        value="{{ request.form.get('Rainfall TCP004 (mm)', rainfall_data.get('Rainfall TCP004 (mm)', '')) }}"
+                        placeholder="Phak Hai (TCP004)" required>
+                    <label class="form-label">Bang Ban</label>
+                    <input class="form-control" type="number" step="0.01"
+                        name="Rainfall CPY010 (mm)"
+                        value="{{ request.form.get('Rainfall CPY010 (mm)', rainfall_data.get('Rainfall CPY010 (mm)', '')) }}"
+                        placeholder="Bang Ban (CPY010)" required>
+                    <label class="form-label">Tha Ruea</label>
+                    <input class="form-control" type="number" step="0.01"
+                        name="Rainfall 48415 (mm)" 
+                        value="{{ request.form.get('Rainfall 48415 (mm)', rainfall_data.get('Rainfall 48415 (mm)', '')) }}"
+                        placeholder="Tha Ruea (48415)" required>
+                    <label class="form-label">Bang Pahan</label>
+                    <input class="form-control" type="number" step="0.01"
+                        name="Rainfall LBI001 (mm)"
+                        value="{{ request.form.get('Rainfall LBI001 (mm)', rainfall_data.get('Rainfall LBI001 (mm)', '')) }}"
+                        placeholder="Bang Pahan (LBI001)" required>
+                </fieldset>
+
+                <!-- Group 3: Weather -->
+                <fieldset>
+                    <legend>Weather</legend>
+                    <small class="text-muted d-block mb-2">
+                        Temperature and humidity near Bang Sai Gate (C.29A).
+                    </small>
+
+                    <input class="form-control" type="number" step="0.01"
+                        name="Min_Temp"
+                        value="{{ request.form.get('Min_Temp', temperature_data.get('Min_Temp', '')) }}"
+                        placeholder="Min Temperature (°C), e.g. 23.5" required>
+                    <input class="form-control" type="number" step="0.01"
+                        name="Max_Temp"
+                        value="{{ request.form.get('Max_Temp', temperature_data.get('Max_Temp', '')) }}"
+                        placeholder="Max Temperature (°C), e.g. 35.2" required>
+                    <input class="form-control" type="number" step="0.01"
+                        name="relative humidity (%)"
+                        value="{{ request.form.get('relative humidity (%)', humidity_data.get('relative humidity (%)', '')) }}"
+                        placeholder="Relative Humidity (%), e.g. 78.0" required>
+                </fieldset>
+
+                <button type="submit" class="btn btn-primary">Predict Flood Risk</button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
