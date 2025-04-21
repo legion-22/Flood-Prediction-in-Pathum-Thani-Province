@@ -1,4 +1,4 @@
-# Flood Risk Prediction in Pathum Thani Based on Upstream Water Flow at Bang Sai Gate (C.29A)
+# Flood Risk Prediction in Pathum Thani Based on Upstream Water Flow at Bang Sai Water Gate
 
 This project aims to predict the water discharge at **Bang Sai Gate (C.29A)**, a key water control point near Pathum Thani Province, using upstream environmental data. The goal is to assess **flood risk levels** in the area using machine learning techniques.
 
