@@ -6,8 +6,8 @@ import requests
 app = Flask(__name__)
 
 # Load model and preprocessing tools
-model = joblib.load(r"E:\Jan_2025\ML\Project\Code\Git_ML_Project\model\XGBoost_model.pkl")  # Trained regression model
-scaler = joblib.load(r"E:\Jan_2025\ML\Project\Code\Git_ML_Project\model\scaler.pkl")      # Fitted scaler for input features
+model = joblib.load(r"E:\Jan_2025\ML\Project\Code\Flood-Prediction-in-Pathum-Thani-Province\model\XGBoost_model.pkl")  # Trained regression model
+scaler = joblib.load(r"E:\Jan_2025\ML\Project\Code\Flood-Prediction-in-Pathum-Thani-Province\model\scaler.pkl")      # Fitted scaler for input features
 
 # Feature order used during training (no label encoding needed now)
 feature_names = [
@@ -153,11 +153,13 @@ def predict():
         input_data = [float(request.form[name]) for name in feature_names]
         input_array = np.array(input_data).reshape(1, -1)
 
-        # Scale features
-        input_scaled = scaler.transform(input_array)
-
-        # Make prediction (regression)
-        prediction = model.predict(input_array)[0]
+        # If all values are zero, return prediction = 0
+        if all(value == 0 for value in input_data):
+            prediction = 0
+        else:
+            # Scale features and predict
+            input_scaled = scaler.transform(input_array)
+            prediction = model.predict(input_array)[0]
 
         # Interpret prediction as a flood category
         if prediction < 2500:
